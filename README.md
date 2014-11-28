@@ -88,8 +88,9 @@ Actions have this format ```[action-function action-arg0 action-arg1 action-arg2
 
 Those libs are supported by BigBang
 
+* [milesian/id-component](https://github.com/milesian/id-component) attach meta id key to components
 * [tangrammer/co-dependency](https://github.com/tangrammer/co-dependency) co-dependency facility in stuartsierra/component library (Inverse Dependency Inyection)
-* [tangrammer/epi-component](https://github.com/tangrammer/epi-component) facility to apply AOP in stuartsierra/component library
+* [milesian/epi-component](https://github.com/milesian/epi-component) facility to apply AOP in stuartsierra/component library
 
 
 
