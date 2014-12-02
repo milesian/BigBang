@@ -75,10 +75,10 @@ Actions have this format ```[action-function action-arg0 action-arg1 action-arg2
 
 
 ;; instead of calling component/start call bigbang/expand 
-(def system (bigbang/expand system-map {:before-start [[actions/add-meta-key system-map]]
-                                        :on-start [[actions/assoc-meta-who-to-deps]
+(def system (bigbang/expand system-map {:before-start [[identity-actions/add-meta-key system-map]]
+                                        :on-start [[identity-actions/assoc-meta-who-to-deps]
                                                    [component/start]
-                                                   [actions/wrap improved-logging]]
+                                                   [aop-actions/wrap improved-logging]]
                                         :after-start []}))
 
 ```
@@ -88,9 +88,9 @@ Actions have this format ```[action-function action-arg0 action-arg1 action-arg2
 
 Those libs are supported by BigBang
 
-* [milesian/id-component](https://github.com/milesian/id-component) attach meta id key to components
+* [milesian/identity](https://github.com/milesian/identity) identity actions to apply to components and dependencies 
 * [tangrammer/co-dependency](https://github.com/tangrammer/co-dependency) co-dependency facility in stuartsierra/component library (Inverse Dependency Inyection)
-* [milesian/epi-component](https://github.com/milesian/epi-component) facility to apply AOP in stuartsierra/component library
+* [milesian/aop](https://github.com/milesian/aop) facility to apply AOP in stuartsierra/component library
 
 
 
