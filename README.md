@@ -19,12 +19,22 @@ BigBang helps you [customize](https://github.com/stuartsierra/component#customiz
 
 That's true, but if you try to apply several transformations (or you can called them reductions too) distinguishing those that must be done at the same invocation time of component/start (being able to specify also those that just before same start-invocation or just after same start-invocation) from those that can happen before or after system is started, then BigBang library it's great for you! 
 
+##  BigBang Actions and Times
+An action is specified very similar as you'll write using [clojure.core/apply](http://clojuredocs.org/clojure.core/apply) but without using "apply" and enclosing it by brackets 
+```clojure
+[action-function action-arg0 action-arg1 action-arg2 ...]
+```
+Actions must at least receive the component instance to update (and anymore args ) and has to return the component updated
+```
+(defn  your-action [component & more]
+....
+;;=> return your updated component
+component
+)
+```
+##  BigBang DSL
 
-
-
-##  bigbang/expand DSL
-
-As you can see ```bigbang/expand``` needs a common system-map instance  and a map with 3 keys ```:before-start :on-start :after-start``` 
+```bigbang/expand``` needs a common system-map instance and a map with 3 keys ```:before-start :on-start :after-start``` 
 
 ```clojure 
 (defn expand
