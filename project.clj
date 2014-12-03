@@ -5,5 +5,6 @@
             :url "http://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [com.stuartsierra/component "0.2.2"]]
-  :profiles {:dev {:dependencies [[milesian/aop "0.1.2"]
+  :profiles {:dev {:dependencies [[tangrammer/co-dependency "0.1.4-SNAPSHOT"]
+                                  [milesian/aop "0.1.2"]
                                   [milesian/identity "0.1.2"]]}})

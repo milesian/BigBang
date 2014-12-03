@@ -42,7 +42,7 @@
 
 (defrecord System1 [a b c])
 
-(defn system-1 []
+(defn new-system-map []
   (map->System1 {:a (-> (component-a))
                  :b (-> (component-b)
                         (component/using [:a]))
