@@ -1,4 +1,4 @@
-# BigBang. Customize the way your stuartsierra/component system starts
+# BigBang
 
 Expands the universe behind  [com.stuartsierra.component/update-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L117) functionality 
  
