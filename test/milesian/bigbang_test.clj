@@ -15,13 +15,15 @@
 
 (def system-map (new-system-map))
 
-(def system (bigbang/expand system-map {:before-start [[identity/add-meta-key system-map]]
-                                        :on-start [[identity/assoc-meta-who-to-deps]
-                                                   [component/start]
-                                                   [aop/wrap (new-simple-protocol-matcher :protocols [Listen #_Talk] :fn logging-function-invocation)]
-                                                   #_[aop/wrap (aop-matchers/new-component-matcher :system system-map :components [:c] :fn logging-function-invocation)]
-                                                   ]
-                                        :after-start []}))
+(def system (bigbang/expand system-map {:before-start [[identity/add-meta-key system-map]
+                                                       [identity/assoc-meta-who-to-deps]]
+                                        :after-start [[aop/wrap (new-simple-protocol-matcher
+                                                                      :protocols [Listen #_Talk]
+                                                                      :fn logging-function-invocation)]
+
+                                                           #_[aop/wrap (aop-matchers/new-component-matcher :system system-map :components [:c] :fn logging-function-invocation)]
+
+                                                      ]}))
 
 
 (listening (:b system))
