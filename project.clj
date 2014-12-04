@@ -6,4 +6,5 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [com.stuartsierra/component "0.2.2"]]
   :profiles {:dev {:dependencies [[milesian/aop "0.1.2-SNAPSHOT"]
-                                  [milesian/identity "0.1.2"]]}})
+                                  [milesian/identity "0.1.2"]
+                                  [milesian/system-examples "0.1.1-SNAPSHOT"]]}})
