@@ -15,50 +15,12 @@ but... what does update-system actually do?
 
 BigBang helps you [customize](https://github.com/stuartsierra/component#customization) the way your system starts providing a very simple way. 
 
-In this library you'll find only one function thought to be used as system actions hub.
+In this project so far you'll find only one function :) that it's been thought to be used as a system actions hub.
 
 
 **Hey!, you don't really need BigBang library to work with stuartsierra/component**
 
-That's true, but if you try to apply several transformations (or you can say reductions) to your system, distinguishing "before" or "after" sequence into the invocation time of component/start (I mean being able to specify those that have to be invoked  just before same start-invocation or just after same start-invocation)  then BigBang library it's great for you! 
-
-##  BigBang Actions and Times
-An action is specified very similar as you'll write using [clojure.core/apply](http://clojuredocs.org/clojure.core/apply) but without using "apply" and enclosing it with brackets 
-```clojure
-[action-function action-arg0 action-arg1 action-arg2 ...]
-```
-Actions must at least receive the component instance to update (and anymore args ) and has to return the component updated
-```
-(defn your-action [component & more]
-....
-;;=> actions should return the updated component
-component
-)
-```
-##  BigBang/expand
-
-```bigbang/expand``` needs a common system-map instance and a map with 2 keys ```:before-start :after-start``` 
-
-```clojure 
-(defn expand
-  [system-map {:keys [before-start after-start]}]
-...)
-
-```
-
-#### BigBang Phases  :before-start :after-start
-
-This keys represents the different phases that your actions could happen.  
-
-All phases recieve a vector of vectors
-
-**:before-start** in this place your actions need to be applyed at the same invocation time that component/start, but just before component/start  
-**:after-start** in this place your actions need to be applyed at the same invocation time that component/start, but just after component/start 
-
-
-#### BigBang Actions
-
-Actions have this format ```[action-function action-arg0 action-arg1 action-arg2 ...]```
+That's true, but if you try to apply several transformations (or you can say reductions) to your system, being able to specify those that have to be invoked  **just before same start-invocation-time** from  those that have to happen **just after same start-invocation-time**,  then BigBang library it's great for it! 
 
 #### Releases and Dependency Information
 
@@ -69,6 +31,42 @@ Actions have this format ```[action-function action-arg0 action-arg1 action-arg2
 ```clojure
 :dependencies [[org.clojure/clojure "1.6.0"]
                [com.stuartsierra/component "0.2.2"]]
+```
+
+
+##  BigBang Actions and Phases
+An action is specified in a very similar way as you use [clojure.core/apply](http://clojuredocs.org/clojure.core/apply) but without using "apply" and enclosing it with brackets 
+```clojure
+[action-function action-arg0 action-arg1 action-arg2 ...]
+```
+Actions must at least receive the component instance to update (and anymore args ) and has to return the component updated
+```
+(defn your-action-function [component & more]
+....
+;;=> actions should return the updated component
+component
+)
+```
+
+#### BigBang Phases  :before-start :after-start
+
+This keys represents the different phases that your actions could happen.  
+
+All phases recieve a vector of bigbang actions (that are vectors too)
+
+**:before-start** here the actions that need to be applyed at the same invocation time that component/start, but just before component/start  
+**:after-start**  here the actions that need to be applyed at the same invocation time that component/start, but just after component/start 
+
+
+##  BigBang/expand
+
+```bigbang/expand``` needs a common system-map instance and a map with 2 keys ```:before-start :after-start``` 
+
+```clojure 
+(defn expand
+  [system-map {:keys [before-start after-start]}]
+...)
+
 ```
 
 
@@ -87,8 +85,20 @@ Actions have this format ```[action-function action-arg0 action-arg1 action-arg2
                              :after-start  [[aop/wrap logging-function-invocation]]}))
 ```
 
+#### Integrate with stuartsierra/reloaded workflow
 
-## BigBang Actions, available libraries 
+Replace your reloaded start function for this one
+
+```clojure
+(defn start
+  "BigBang starting the current development system."
+  []
+  (alter-var-root #'system #(bigbang/expand % {:before-start [[identity/add-meta-key %]
+                                                              [identity/assoc-meta-who-to-deps]]
+                                               :after-start [[aop/wrap visualisation-invocation]]})))
+```
+
+## BigBang actions available 
 
 Those libs are supported by BigBang
 
