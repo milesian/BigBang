@@ -20,7 +20,7 @@ In this project so far you'll find only one function :) that it's been thought t
 
 **Hey!, you don't really need BigBang library to work with stuartsierra/component**
 
-That's true, but if you try to apply several transformations (or you can say reductions) to your system, being able to specify those that have to be invoked  **just before same start-invocation-time** from  those that have to happen **just after same start-invocation-time**,  then BigBang library it's great for it! 
+That's true, but if you try to apply several transformations (or you can say reductions) to your system, being able to specify those that have to be invoked  **just before same start-invocation-time** from  those that have to be invoked  **just after same start-invocation-time**,  then BigBang library it's great for it! 
 
 #### Releases and Dependency Information
 
