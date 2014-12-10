@@ -63,7 +63,7 @@ Actions have this format ```[action-function action-arg0 action-arg1 action-arg2
 #### Releases and Dependency Information
 
 ```clojure
-[milesian/bigbang "0.1.1-SNAPSHOT"]
+[milesian/bigbang "0.1.1"]
 ```
 
 ```clojure
