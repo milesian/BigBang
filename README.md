@@ -1,14 +1,22 @@
 # BigBang
-
-Expands the universe behind stuartsierra **component/update-system** function to [customize](https://github.com/stuartsierra/component#customization) the way your system starts.
+Expands the universe behind stuartsierra **component/update-system** function.
  
 ![image](https://dl.dropboxusercontent.com/u/8688858/bigbang.png)
 
-### Did you ever wonder how your system started? 
+### Customizing your stuartsierra/component system
 
-As you can check, every time you call [component/start-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L151) you are indirectly using ```component/update-system``` fn.   
-So let's take a look to this main fn:
+Extracted from component/[README#customization](https://github.com/stuartsierra/component/blob/master/README.md#customization) :
 
+> Both ```update-system``` and ```update-system-reverse``` take a function as an argument   
+and call it on each component in the system. 
+Along the way, they ```assoc``` in the updated dependencies of each component.   
+The ```update-system``` function iterates over the components in dependency order   
+ (a component will be called after its dependencies)....
+
+.. then It's not surprising  that  [component/start-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L151) also uses ```component/update-system``` to make its work done.   
+
+## component/update-system: recieves a system and a fn to return a new-updated-system
+Let's look the stuartsierra doc and implementation
 ```clojure
 (defn update-system
   "Invokes (apply f component args) on each of the components at
@@ -26,49 +34,54 @@ So let's take a look to this main fn:
 
 ```
 
-**Nothing strange at this side!**,we can see a very normal reduce function. Then, behind (component/start-system) call there is a system reduction using an update-component-with-fresh-injected-dependencies-fn. 
-And logically, **if we pass a system we get a new-updated-system**.
+**Great logic and nothing strange at this side** ... Then, behind [component/start-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L151) there is a reduction on the system that applies any fn to each component after injecting fresh dependencies. And... logically, **if we pass a system and a fn we get a new-updated-system**.
 
-# The only way to customize your system (by chance!) is update-system 
-Also you can find in component/[README](https://github.com/stuartsierra/component/blob/master/README.md#customization) the relevance of update-system fn as **system customization way**:
+### but what is the component definition? 
+Extracted from the component/[README](https://github.com/stuartsierra/component/blob/master/README.md)
+> For the purposes of this framework, a component is a collection of functions or procedures which **share some runtime state**.
 
-> Both ```update-system``` and ```update-system-reverse``` take a function as an argument   
-and call it on each component in the system. 
-Along the way, they ```assoc``` in the updated dependencies of each component.   
-The ```update-system``` function iterates over the components in dependency order   
- (a component will be called after its dependencies)....
+For me this **functions that share runtime state** is the key to understand in our clojure functional world. And I think that its meaning can easily improved with this extended started-component definition:
 
+### started-component (a component after component/start)
+**a started** component is a collection of functions or procedures wich share some runtime state **produced in component/start** (possibly using other started components, also called dependencies) 
 
-## But wait!! have you already read the component definition?
-Also extracted from the component/[README](https://github.com/stuartsierra/component/blob/master/README.md)
-> For the purposes of this framework,    
-> a component is a collection of functions or procedures which   
-> **share some runtime state**.
+Examples of started components can be a database component with an open connection db, or a webserver component listening on a port opened.
 
-**I'd like to highlight here that this share runtime state (or runtime value) is produced at the invocation time of  ```(update-system system component/start)```** 
+### joining component/update-system and component/start   
 
-# Joining new-updated-states with share-runtime-state   
-
-Every update-system reduction returns a new-updated-system (meaning a new state or a new value) but our components need to share the **"last"** new updated state to be updated.
-
-Or in other words, try to find the differences of following two sequence calls:
+To understad these two fns together, let's find the differences of following two sequence calls:
 
 ```clojure
-(-> system 
-    (component/update-system your-fn your-args)  ;;  new-updated-system 
-    (component/update-system component/start)    ;;  started-new-updated-system)
-(-> system 
-    (component/update-system component/start)    ;;  started-system 
-    (component/update-system your-fn your-args)  ;;  new-updated-started-system)
+(-> system                                              ;;  {components}
+    (component/update-system your-update-fn your-args)  ;;  {updated-components}
+    (component/update-system component/start)           ;;  {started-updated-components}
+    
+(-> system                                              ;;  {components}
+    (component/update-system component/start)           ;;  {started-components} 
+    (component/update-system your-update-fn your-args)  ;;  {updated-started-components}
 ```
 
-In first sequence, your components will start (or will share runtime state) using previous new-updated-system. But in second sequence, your component-share-runtime-state will not use the subsequent update, due that started-system is a previous runtime state from new-updated-started-system
+If we simplify the problem...
+```clojure
+;; case 1 {started-updated-components}
 
-In other words:   
-**When we call start we get the running system and further updates over this state are not used in ** 
+user> (def system {:a 1})
+user> (def system-updated (assoc system :c 3))
+user> (def system-started (assoc system-updated :b 2))
+user>  (system-started :c)
+=> :3
 
+;; case 2 {updated-started-components}
 
-**Hey!, you don't really need BigBang library to work with stuartsierra/component**
+user> (def system {:a 1})
+user> (def system-started (assoc system :b 2))
+user> (def system-updated (assoc system-started :c 3))
+user> (nil? (system-started :c))
+=> true
+```
+
+Although is very obvius now (and of course in functional language too): **When we update our system with component/start we get the running system state and further updates over this running system state are not available to this started-system-value**
+ 
 
 That's true, but if you try to apply several transformations (or you can say reductions) to your system, being able to specify those that have to be invoked  **just before same start-invocation-time** from  those that have to be invoked  **just after same start-invocation-time**,  then BigBang library it's great for it! 
 
