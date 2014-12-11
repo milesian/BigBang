@@ -1,8 +1,9 @@
-# BigBang: compose component/system-update(s) in component/start invocation time
+# BigBang
+### compose component/system-update(s) in component/start invocation time
 
 ![image](https://dl.dropboxusercontent.com/u/8688858/bigbang.png)
 
-### Customize the way your stuartsierra/component system starts
+### Customizing the way your stuartsierra/component system starts
 
 Extracted from component/[README#customization](https://github.com/stuartsierra/component/blob/master/README.md#customization) :
 
