@@ -47,7 +47,7 @@ For me this **"functions that share runtime state"** is the key that we need to 
 
 Examples of started components can be a database component with an open connection db, or a webserver component listening on a port opened.
 
-#### joining component/update-system and component/start   
+### trying to use component/update-system and component/start   
 
 To understand these two fns together, let's find the differences of following two sequence calls:
 
