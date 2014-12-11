@@ -7,7 +7,7 @@
 #### Why Did I write this library?
 After trying to get working Aspect Oriented Programming and Reverse Dependency Injection in stuartuartsierra/component systems I realised that system customization topic wasn't treated as it deserved
 
-Once I wrote this BigBang lib, my previous tries ([AOP](https://github.com/milesian/aop) and [co-dependeny](https://github.com/tangrammer/co-dependency)) come up with more better design, indeed this BigBang library is basically a very tiny and simple pattern, but very usefull :)
+Once I wrote this BigBang lib, my previous tries ([AOP](https://github.com/milesian/aop) and [co-dependency](https://github.com/tangrammer/co-dependency)) come up with more better design, indeed this BigBang library is basically a very tiny and simple pattern, but very useful :)
 
 
 ### Customizing the way your stuartsierra/component system starts
