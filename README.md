@@ -4,7 +4,10 @@
 ![image](https://dl.dropboxusercontent.com/u/8688858/bigbang.png)
 
 
-#### Why Did I write this library?
+#### Why did I write this library?
+
+All this stuff started when I wanted to achieve [real time system visualisations](https://github.com/tangrammer/webclient-system-diagram), and in this travel I had to deal with [AOP](https://github.com/milesian/aop) in stuartsierra/component to listen which component protocols were being used in component communication.
+
 After trying to get working Aspect Oriented Programming and Reverse Dependency Injection in stuartuartsierra/component systems I realised that system customization topic wasn't treated as it deserved
 
 Once I wrote this BigBang lib, my previous tries ([AOP](https://github.com/milesian/aop) and [co-dependency](https://github.com/tangrammer/co-dependency)) come up with more better design, indeed this BigBang library is basically a very tiny and simple pattern, but very useful :)
