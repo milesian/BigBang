@@ -1,4 +1,4 @@
-# BigBang
+# BigBang: compose component/system-update(s) in component/start invocation time
 
 ![image](https://dl.dropboxusercontent.com/u/8688858/bigbang.png)
 
