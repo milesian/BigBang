@@ -49,7 +49,7 @@ Examples of started components can be a database component with an open connecti
 
 ### joining component/update-system and component/start   
 
-To understad these two fns together, let's find the differences of following two sequence calls:
+To understand these two fns together, let's find the differences of following two sequence calls:
 
 ```clojure
 (-> system                                              ;;  {components}
@@ -81,28 +81,25 @@ user> (nil? (system-started :c))
 ```
 
 Although is very obvius now (and of course in functional language too): **When we update our system with component/start we get the running system state and further updates over this running system state are not available to this started-system-value**
+
+##  BigBang/expand: apply updates in component/start invocation time
+BigBang goes further in this time distinction to apply updates and lets you compose your update functions just-before-start and just-after-start, meaning boths inside component/start invocation time
+
+```bigbang/expand``` needs a common stuartsierra/system-map instance and a map with 2 keys ```:before-start :after-start``` and for each key a vector of bigbang actions as value
+
+```clojure 
+(defn expand
+  [system-map {:keys [before-start after-start]}]
+...)
+
+```
  
-
-That's true, but if you try to apply several transformations (or you can say reductions) to your system, being able to specify those that have to be invoked  **just before same start-invocation-time** from  those that have to be invoked  **just after same start-invocation-time**,  then BigBang library it's great for it! 
-
-#### Releases and Dependency Information
-
-```clojure
-[milesian/bigbang "0.1.1"]
-```
-
-```clojure
-:dependencies [[org.clojure/clojure "1.6.0"]
-               [com.stuartsierra/component "0.2.2"]]
-```
-
-
 ##  BigBang Actions and Phases
 An action is specified in a very similar way as you use [clojure.core/apply](http://clojuredocs.org/clojure.core/apply) but without using "apply" and enclosing it with brackets 
 ```clojure
 [action-function action-arg0 action-arg1 action-arg2 ...]
 ```
-Actions must at least receive the component instance to update (and anymore args ) and has to return the component updated
+Actions must at least receive the component instance to update (and anymore args) and have to return the component updated
 ```
 (defn your-action-function [component & more]
 ....
@@ -119,18 +116,6 @@ All phases recieve a vector of bigbang actions (that are vectors too)
 
 **:before-start** here the actions that need to be applyed at the same invocation time that component/start, but just before component/start  
 **:after-start**  here the actions that need to be applyed at the same invocation time that component/start, but just after component/start 
-
-
-##  BigBang/expand
-
-```bigbang/expand``` needs a common system-map instance and a map with 2 keys ```:before-start :after-start``` 
-
-```clojure 
-(defn expand
-  [system-map {:keys [before-start after-start]}]
-...)
-
-```
 
 
 ## Example
@@ -169,6 +154,16 @@ Those libs are supported by BigBang
 * [milesian/identity](https://github.com/milesian/identity) identity actions to apply to components and dependencies 
 * [milesian/aop](https://github.com/milesian/aop) facility to apply AOP in stuartsierra/component library
 
+#### Releases and Dependency Information
+
+```clojure
+[milesian/bigbang "0.1.1"]
+```
+
+```clojure
+:dependencies [[org.clojure/clojure "1.6.0"]
+               [com.stuartsierra/component "0.2.2"]]
+```
 
 
 ## License
