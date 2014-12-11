@@ -1,19 +1,71 @@
 # BigBang
 
-Expands the universe behind  [com.stuartsierra.component/update-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L117) functionality,  [customizing](https://github.com/stuartsierra/component#customization) the way your system starts.
+Expands the universe behind stuartsierra **component/update-system** function to [customize](https://github.com/stuartsierra/component#customization) the way your system starts.
  
 ![image](https://dl.dropboxusercontent.com/u/8688858/bigbang.png)
 
-Working with stuartsierra/component library enforces us to use **component/update-system** function ([indirectly](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L143-L151) or directly) to start our system.    
+### Did you ever wonder how your system started? 
 
-but... what does update-system actually do?
-```clojure 
+As you can check, every time you call [component/start-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L151) you are indirectly using ```component/update-system``` fn.   
+So let's take a look to this main fn:
+
+```clojure
+(defn update-system
   "Invokes (apply f component args) on each of the components at
   component-keys in the system, in dependency order. Before invoking
   f, assoc's updated dependencies of the component."
+  [system component-keys f & args]
+  (let [graph (dependency-graph system component-keys)]
+    (reduce (fn [system key]
+              (assoc system key
+                     (-> (get-component system key)
+                         (assoc-dependencies system)
+                         (try-action system key f args))))
+            system
+            (sort (dep/topo-comparator graph) component-keys))))
+
 ```
 
-In this project so far you'll find only one function :) that it's been thought to be used as a system actions hub.
+**Nothing strange at this side!**,we can see a very normal reduce function. Then, behind (component/start-system) call there is a system reduction using an update-component-with-fresh-injected-dependencies-fn. 
+And logically, **if we pass a system we get a new-updated-system**.
+
+# The only way to customize your system (by chance!) is update-system 
+Also you can find in component/[README](https://github.com/stuartsierra/component/blob/master/README.md#customization) the relevance of update-system fn as **system customization way**:
+
+> Both ```update-system``` and ```update-system-reverse``` take a function as an argument   
+and call it on each component in the system. 
+Along the way, they ```assoc``` in the updated dependencies of each component.   
+The ```update-system``` function iterates over the components in dependency order   
+ (a component will be called after its dependencies)....
+
+
+## But wait!! have you already read the component definition?
+Also extracted from the component/[README](https://github.com/stuartsierra/component/blob/master/README.md)
+> For the purposes of this framework,    
+> a component is a collection of functions or procedures which   
+> **share some runtime state**.
+
+**I'd like to highlight here that this share runtime state (or runtime value) is produced at the invocation time of  ```(update-system system component/start)```** 
+
+# Joining new-updated-states with share-runtime-state   
+
+Every update-system reduction returns a new-updated-system (meaning a new state or a new value) but our components need to share the **"last"** new updated state to be updated.
+
+Or in other words, try to find the differences of following two sequence calls:
+
+```clojure
+(-> system 
+    (component/update-system your-fn your-args)  ;;  new-updated-system 
+    (component/update-system component/start)    ;;  started-new-updated-system)
+(-> system 
+    (component/update-system component/start)    ;;  started-system 
+    (component/update-system your-fn your-args)  ;;  new-updated-started-system)
+```
+
+In first sequence, your components will start (or will share runtime state) using previous new-updated-system. But in second sequence, your component-share-runtime-state will not use the subsequent update, due that started-system is a previous runtime state from new-updated-started-system
+
+In other words:   
+**When we call start we get the running system and further updates over this state are not used in ** 
 
 
 **Hey!, you don't really need BigBang library to work with stuartsierra/component**
