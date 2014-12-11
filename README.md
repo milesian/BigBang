@@ -1,9 +1,8 @@
 # BigBang
-Expands the universe behind stuartsierra **component/update-system** function.
- 
+
 ![image](https://dl.dropboxusercontent.com/u/8688858/bigbang.png)
 
-### Customizing your stuartsierra/component system
+### Customize the way your stuartsierra/component system starts
 
 Extracted from component/[README#customization](https://github.com/stuartsierra/component/blob/master/README.md#customization) :
 
@@ -13,9 +12,9 @@ Along the way, they ```assoc``` in the updated dependencies of each component.
 The ```update-system``` function iterates over the components in dependency order   
  (a component will be called after its dependencies)....
 
-.. then It's not surprising  that  [component/start-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L151) also uses ```component/update-system``` to make its work done.   
+.. then It's not really surprising  that  [component/start-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L151) also uses ```component/update-system``` to call component/start to get the system started.
 
-## component/update-system: recieves a system and a fn to return a new-updated-system
+### component/update-system: recieves a system and a fn to return a new-updated-system
 Let's look the stuartsierra doc and implementation
 ```clojure
 (defn update-system
@@ -34,20 +33,20 @@ Let's look the stuartsierra doc and implementation
 
 ```
 
-**Great logic and nothing strange at this side** ... Then, behind [component/start-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L151) there is a reduction on the system that applies any fn to each component after injecting fresh dependencies. And... logically, **if we pass a system and a fn we get a new-updated-system**.
+**Great logic and nothing strange at this side** ... Then, when we call [component/start-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L151) there is actually a call to update-system that it's a reduction on the system that applies any fn to each component after injecting fresh dependencies. And... logically, **if we pass a system and a fn we get a new-updated-system**.
 
-### but what is the component definition? 
+### but... what is the component definition?  
 Extracted from the component/[README](https://github.com/stuartsierra/component/blob/master/README.md)
 > For the purposes of this framework, a component is a collection of functions or procedures which **share some runtime state**.
 
-For me this **functions that share runtime state** is the key to understand in our clojure functional world. And I think that its meaning can easily improved with this extended started-component definition:
+For me this **"functions that share runtime state"** is the key that we need to understand in our clojure functional world. And I think that its meaning can easily improved with this extended started-component definition:
 
-### started-component (a component after component/start)
+#### started-component (a component after component/start)
 **a started** component is a collection of functions or procedures wich share some runtime state **produced in component/start** (possibly using other started components, also called dependencies) 
 
 Examples of started components can be a database component with an open connection db, or a webserver component listening on a port opened.
 
-### joining component/update-system and component/start   
+#### joining component/update-system and component/start   
 
 To understand these two fns together, let's find the differences of following two sequence calls:
 
@@ -80,9 +79,9 @@ user> (nil? (system-started :c))
 => true
 ```
 
-Although is very obvius now (and of course in functional language too): **When we update our system with component/start we get the running system state and further updates over this running system state are not available to this started-system-value**
+Although it is very obvius now (and of course in functional language too): **When we update our system with component/start we get the running system state and further updates over this running system state are not available to this started-system-value**
 
-##  BigBang/expand: apply updates in component/start invocation time
+##  BigBang/expand: compose component/system-updates in component/start invocation time
 BigBang goes further in this time distinction to apply updates and lets you compose your update functions just-before-start and just-after-start, meaning boths inside component/start invocation time
 
 ```bigbang/expand``` needs a common stuartsierra/system-map instance and a map with 2 keys ```:before-start :after-start``` and for each key a vector of bigbang actions as value
@@ -99,7 +98,7 @@ An action is specified in a very similar way as you use [clojure.core/apply](htt
 ```clojure
 [action-function action-arg0 action-arg1 action-arg2 ...]
 ```
-Actions must at least receive the component instance to update (and anymore args) and have to return the component updated
+BigBang actions are defined as common stuartsierra/update-system actions: at least receive the component instance to update (and anymore args) and have to return the component updated
 ```
 (defn your-action-function [component & more]
 ....
