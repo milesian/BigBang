@@ -1,10 +1,10 @@
 # BigBang
 
-Expands the universe behind  [com.stuartsierra.component/update-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L117) functionality 
+Expands the universe behind  [com.stuartsierra.component/update-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L117) functionality,  [customizing](https://github.com/stuartsierra/component#customization) the way your system starts.
  
 ![image](https://dl.dropboxusercontent.com/u/8688858/bigbang.png)
 
-Working with stuartsierra/component library enforces us to use **component/update-system** function ([indirectly](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L143-L151) or directly) for starting (updating with component/start) our system.    
+Working with stuartsierra/component library enforces us to use **component/update-system** function ([indirectly](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L143-L151) or directly) to start our system.    
 
 but... what does update-system actually do?
 ```clojure 
@@ -12,8 +12,6 @@ but... what does update-system actually do?
   component-keys in the system, in dependency order. Before invoking
   f, assoc's updated dependencies of the component."
 ```
-
-BigBang helps you [customize](https://github.com/stuartsierra/component#customization) the way your system starts providing a very simple way. 
 
 In this project so far you'll find only one function :) that it's been thought to be used as a system actions hub.
 
