@@ -1,5 +1,5 @@
 # BigBang
-### compose component/system-update(s) in component/start invocation time
+### compose component/update(s)-system in component/start invocation time
 
 ![image](https://dl.dropboxusercontent.com/u/8688858/bigbang.png)
 
@@ -92,7 +92,7 @@ user> (nil? (system-started :c))
 
 Although it is very obvius now (and of course in functional language too): **When we update our system with component/start we get the running system state and further updates over this running system state are not available to this started-system-value**
 
-##  BigBang/expand: compose component/system-updates in component/start invocation time
+##  BigBang/expand: compose component/update(s)-system in component/start invocation time
 BigBang goes further in this time distinction to apply updates and lets you compose your update functions just-before-start and just-after-start, meaning boths inside component/start invocation time
 
 ```bigbang/expand``` needs a common stuartsierra/system-map instance and a map with 2 keys ```:before-start :after-start``` and for each key a vector of bigbang actions as value
