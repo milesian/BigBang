@@ -4,96 +4,26 @@
 ![image](https://dl.dropboxusercontent.com/u/8688858/bigbang.png)
 
 
-#### Why did I write this library?
+[Why did I write this library?](http://tangrammer.github.io/posts/12-12-2014-bigbang.html)
 
-All this stuff started when I wanted to achieve [real time system visualisations](https://github.com/tangrammer/webclient-system-diagram), and in this travel I had to deal with [AOP](https://github.com/milesian/aop) in stuartsierra/component to listen which component protocols were being used in component communication.
+Generalize the "how and when can you customize your system?" **letting you compose all your component updates in the same component/start invocation time**, but distinguishing those updates that have to happen just-before from those that have to happen just-after component/start.
 
-After trying to get working Aspect Oriented Programming and Reverse Dependency Injection in stuartuartsierra/component systems I realised that system customization topic wasn't treated as it deserved
-
-Once I wrote this BigBang lib, my previous tries ([AOP](https://github.com/milesian/aop) and [co-dependency](https://github.com/tangrammer/co-dependency)) come up with more better design, indeed this BigBang library is basically a very tiny and simple pattern, but very useful :)
-
-
-### Customizing the way your stuartsierra/component system starts
-
-Extracted from component/[README#customization](https://github.com/stuartsierra/component/blob/master/README.md#customization) :
-
-> Both ```update-system``` and ```update-system-reverse``` take a function as an argument   
-and call it on each component in the system. 
-Along the way, they ```assoc``` in the updated dependencies of each component.   
-The ```update-system``` function iterates over the components in dependency order   
- (a component will be called after its dependencies)....
-
-.. then It's not really surprising  that  [component/start-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L151) also uses ```component/update-system``` to call component/start to get the system started.
-
-### component/update-system: recieves a system and a fn to return a new-updated-system
-Let's look the stuartsierra doc and implementation
-```clojure
-(defn update-system
-  "Invokes (apply f component args) on each of the components at
-  component-keys in the system, in dependency order. Before invoking
-  f, assoc's updated dependencies of the component."
-  [system component-keys f & args]
-  (let [graph (dependency-graph system component-keys)]
-    (reduce (fn [system key]
-              (assoc system key
-                     (-> (get-component system key)
-                         (assoc-dependencies system)
-                         (try-action system key f args))))
-            system
-            (sort (dep/topo-comparator graph) component-keys))))
-
-```
-
-**Great logic and nothing strange at this side** ... Then, when we call [component/start-system](https://github.com/stuartsierra/component/blob/master/src/com/stuartsierra/component.clj#L151) there is actually a call to update-system that it's a reduction on the system that applies any fn to each component after injecting fresh dependencies. And... logically, **if we pass a system and a fn we get a new-updated-system**.
-
-### but... what is the component definition?  
-Extracted from the component/[README](https://github.com/stuartsierra/component/blob/master/README.md)
-> For the purposes of this framework, a component is a collection of functions or procedures which **share some runtime state**.
-
-For me this **"functions that share runtime state"** is the key that we need to understand in our clojure functional world. And I think that its meaning can easily improved with this extended started-component definition:
-
-#### started-component (a component after component/start)
-**a started** component is a collection of functions or procedures wich share some runtime state **produced in component/start** (possibly using other started components, also called dependencies) 
-
-Examples of started components can be a database component with an open connection db, or a webserver component listening on a port opened.
-
-### trying to use component/update-system and component/start   
-
-To understand these two fns together, let's find the differences of following two sequence calls:
+So you write this code
 
 ```clojure
-(-> system                                              ;;  {components}
-    (component/update-system your-update-fn your-args)  ;;  {updated-components}
-    (component/update-system component/start)           ;;  {started-updated-components}
-    
-(-> system                                              ;;  {components}
-    (component/update-system component/start)           ;;  {started-components} 
-    (component/update-system your-update-fn your-args)  ;;  {updated-started-components}
+
+(bigbang/expand system-map
+                        {:before-start [[fn1 arg1]
+                                        [fn2 arg1 arg2]]
+                         :after-start  [[fn3 arg1 arg2]
+                                        [fn4 arg1]]})
 ```
 
-If we simplify the problem...
-```clojure
-;; case 1 {started-updated-components}
+and you get something similar to: 
 
-user> (def system {:a 1})
-user> (def system-updated (assoc system :c 3))
-user> (def system-started (assoc system-updated :b 2))
-user>  (system-started :c)
-=> :3
-
-;; case 2 {updated-started-components}
-
-user> (def system {:a 1})
-user> (def system-started (assoc system :b 2))
-user> (def system-updated (assoc system-started :c 3))
-user> (nil? (system-started :c))
-=> true
+```clojure 
+(update-system system-map #(comp (apply fn4 [arg1]) (apply fn3 [arg1 arg2]) component/start (apply fn2 [arg1 arg2]) (apply fn1 [arg1]))
 ```
-
-Although it is very obvius now (and of course in functional language too): **When we update our system with component/start we get the running system state and further updates over this running system state are not available to this started-system-value**
-
-##  BigBang/expand: compose component/update(s)-system in component/start invocation time
-BigBang goes further in this time distinction to apply updates and lets you compose your update functions just-before-start and just-after-start, meaning boths inside component/start invocation time
 
 ```bigbang/expand``` needs a common stuartsierra/system-map instance and a map with 2 keys ```:before-start :after-start``` and for each key a vector of bigbang actions as value
 
