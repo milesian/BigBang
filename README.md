@@ -6,7 +6,7 @@
 
 [Why did I write this library?](http://tangrammer.github.io/posts/12-12-2014-bigbang.html)
 
-Generalize the "how and when can you customize your system?" **letting you compose all your component updates in the same component/start invocation time**, but distinguishing those updates that have to happen just-before from those that have to happen just-after component/start.
+BigBang generalizes the "how and when can you customize your system?" **letting you compose all your component updates in the same component/start invocation time**, but distinguishing those updates that have to happen just-before from those that have to happen just-after component/start.
 
 So you write this code
 
@@ -25,15 +25,6 @@ and you get something similar to:
 (update-system system-map #(comp (apply fn4 [arg1]) (apply fn3 [arg1 arg2]) component/start (apply fn2 [arg1 arg2]) (apply fn1 [arg1]))
 ```
 
-```bigbang/expand``` needs a common stuartsierra/system-map instance and a map with 2 keys ```:before-start :after-start``` and for each key a vector of bigbang actions as value
-
-```clojure 
-(defn expand
-  [system-map {:keys [before-start after-start]}]
-...)
-
-```
- 
 ##  BigBang Actions and Phases
 An action is specified in a very similar way as you use [clojure.core/apply](http://clojuredocs.org/clojure.core/apply) but without using "apply" and enclosing it with brackets 
 ```clojure
