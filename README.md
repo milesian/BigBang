@@ -1,10 +1,13 @@
 # BigBang
-### compose component/update(s)-system in component/start invocation time
+
+#### Why did I write this library? 
+[http://tangrammer.github.io/posts/12-12-2014-bigbang.html](http://tangrammer.github.io/posts/12-12-2014-bigbang.html)
+
+### Compose component/update(s)-system in component/start invocation time
 
 ![image](https://dl.dropboxusercontent.com/u/8688858/bigbang.png)
 
 
-[Why did I write this library?](http://tangrammer.github.io/posts/12-12-2014-bigbang.html)
 
 BigBang generalizes the "how and when can you customize your system?" **letting you compose all your component updates in the same component/start invocation time**, but distinguishing those updates that have to happen just-before from those that have to happen just-after component/start.
 
