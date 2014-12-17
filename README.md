@@ -3,7 +3,7 @@
 #### Why did I write this library? 
 [http://tangrammer.github.io/posts/12-12-2014-bigbang.html](http://tangrammer.github.io/posts/12-12-2014-bigbang.html)
 
-### Compose component/update(s)-system in component/start invocation time
+### decomplect your stuartsierra customization system from component/start
 
 ![image](https://dl.dropboxusercontent.com/u/8688858/bigbang.png)
 
